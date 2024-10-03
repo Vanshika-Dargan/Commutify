@@ -1,7 +1,7 @@
 
 // lat long zoom level
 let map = L.map('map').setView([30.1158, 78.2853],13);
-
+let userMarker;
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
     maxZoom: 16,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -22,7 +22,10 @@ navigator.geolocation.watchPosition(onLocationChangeSuccess,onLocationChangeErro
 })
 
 function onLocationChangeSuccess(position){
-   alert([position.coords.latitude,position.coords.longitude]);
+    if(userMarker)
+    map.removeLayer(userMarker);
+    const userCoordinates=[position.coords.latitude,position.coords.longitude];
+    userMarker=L.marker(userCoordinates).addTo(map).bindPopup(userCoordinates.toString()).openPopup();
 }
 
 function onLocationChangeError(error){
@@ -31,8 +34,7 @@ function onLocationChangeError(error){
 function onLocationSuccess(position){
     const userCoordinates=[position.coords.latitude,position.coords.longitude];
     
-    L.marker(userCoordinates).addTo(map).bindPopup('You are here').openPopup();
-
+     userMarker=L.marker(userCoordinates).addTo(map).bindPopup('You are here').openPopup();
     let riderCoordinates = [30.104867698463696, 78.29907060455753];
 
     L.marker(riderCoordinates).addTo(map).bindPopup('Rider is here..').openPopup();
