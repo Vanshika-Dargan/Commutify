@@ -28,6 +28,9 @@ function onLocationSuccess(position){
     console.log(bounds);
     map.fitBounds(bounds);
     drawRoute(userCoordinates,riderCoordinates);
+    let distance=turf.distance(userCoordinates,riderCoordinates,{units: 'kilometers'});
+    distance = distance.toFixed(2);
+    L.popup().setLatLng(riderCoordinates).setContent('Rider is  '+distance+' km away').openOn(map);
 }
 
 function onLocationError(error){
