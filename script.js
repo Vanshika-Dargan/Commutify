@@ -15,9 +15,21 @@ navigator.geolocation.getCurrentPosition(onLocationSuccess,onLocationError,{
     maximumAge: 0 
 });
 
+navigator.geolocation.watchPosition(onLocationChangeSuccess,onLocationChangeError,{
+    enableHighAccuracy: true,
+    timeout: 10000, 
+    maximumAge: 0  
+})
+
+function onLocationChangeSuccess(position){
+   alert([position.coords.latitude,position.coords.longitude]);
+}
+
+function onLocationChangeError(error){
+    alert('Unable to retriev your location:'+error.message)
+}
 function onLocationSuccess(position){
     const userCoordinates=[position.coords.latitude,position.coords.longitude];
-    console.log(userCoordinates);
     
     L.marker(userCoordinates).addTo(map).bindPopup('You are here').openPopup();
 
@@ -25,7 +37,6 @@ function onLocationSuccess(position){
 
     L.marker(riderCoordinates).addTo(map).bindPopup('Rider is here..').openPopup();
     const bounds = L.latLngBounds([userCoordinates, riderCoordinates]);
-    console.log(bounds);
     map.fitBounds(bounds);
     drawRoute(userCoordinates,riderCoordinates);
     let distance=turf.distance(userCoordinates,riderCoordinates,{units: 'kilometers'});
