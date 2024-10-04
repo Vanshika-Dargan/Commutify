@@ -3,12 +3,13 @@
 let map = L.map('map').setView([30.1158, 78.2853],13);
 let routingControl;
 let iconPath;
+let distancePopup;
 let riderCoordinates = [30.104867698463696, 78.29907060455753];
 let busLottie = L.divIcon({
     html: '<div id="lottie"></div>',
     iconSize: [60, 60],
     iconAnchor: [30, 30],
-    className: '' 
+    className: '' ,
 });
 let homeIcon = L.icon({
     iconUrl: './home.png', 
@@ -56,7 +57,11 @@ function onLocationChangeSuccess(position){
     drawRoute(userCoordinates,riderCoordinates);
     let distance=turf.distance(userCoordinates,riderCoordinates,{units: 'kilometers'});
     distance = distance.toFixed(2);
-    L.popup().setLatLng(userCoordinates).setContent('Rider is  '+distance+' km away').openOn(map);
+    if (distancePopup) {
+        distancePopup.setLatLng(userCoordinates).setContent('Rider is ' + distance + ' km away').update();
+    } else {
+        distancePopup = L.popup().setLatLng(userCoordinates).setContent('Rider is ' + distance + ' km away').openOn(map);
+    }
     initLottie();
 }
 
@@ -70,7 +75,7 @@ function onLocationSuccess(position){
     drawRoute(userCoordinates,riderCoordinates);
     let distance=turf.distance(userCoordinates,riderCoordinates,{units: 'kilometers'});
     distance = distance.toFixed(2);
-    L.popup().setLatLng(userCoordinates).setContent('Rider is  '+distance+' km away').openOn(map);
+    distancePopup=L.popup().setLatLng(userCoordinates).setContent('Rider is  '+distance+' km away').openOn(map);
     initLottie();
 }
 
@@ -85,8 +90,11 @@ function onLocationError(error){
 
 function drawRoute(userCoordinates,riderCoordinates){
     if (routingControl) {
-        map.removeControl(routingControl);
-    }
+        routingControl.setWaypoints([
+            L.latLng(userCoordinates),
+            L.latLng(riderCoordinates)
+        ]);
+    } else {
     routingControl=L.Routing.control({
         waypoints:[
             L.latLng(userCoordinates),
@@ -116,4 +124,5 @@ function drawRoute(userCoordinates,riderCoordinates){
               }
     
     }).addTo(map);
+}
 }
