@@ -2,11 +2,18 @@
 // lat long zoom level
 let map = L.map('map').setView([30.1158, 78.2853],13);
 let userMarker;
+let riderMarker;
+let routingControl;
 let busLottie = L.divIcon({
     html: '<div id="lottie"></div>',
-    iconSize: [90, 90],
-    iconAnchor: [45, 45],
+    iconSize: [60, 60],
+    iconAnchor: [30, 30],
     className: '' 
+});
+let homeIcon = L.icon({
+    iconUrl: './home.png', 
+    iconSize: [40, 40], 
+    iconAnchor: [20, 40], 
 });
 
 
@@ -43,11 +50,13 @@ navigator.geolocation.watchPosition(onLocationChangeSuccess,onLocationChangeErro
 })
 
 function onLocationChangeSuccess(position){
-    if(userMarker)
-    map.removeLayer(userMarker);
     const userCoordinates=[position.coords.latitude,position.coords.longitude];
-    userMarker=L.marker(userCoordinates,{ icon: busLottie }).addTo(map);
-    initLottie();
+    if(userMarker){
+    userMarker.setLatLng(userCoordinates);
+    }
+    else{
+        userMarker=L.marker(userCoordinates,{ icon: busLottie }).addTo(map);
+    }
 }
 
 function onLocationChangeError(error){
@@ -55,12 +64,18 @@ function onLocationChangeError(error){
 }
 function onLocationSuccess(position){
     const userCoordinates=[position.coords.latitude,position.coords.longitude];
-    
-    userMarker=L.marker(userCoordinates,{ icon: busLottie }).addTo(map);
+    if(userMarker){
+        userMarker.setLatLng(userCoordinates);
+        }
+        else{
+            userMarker=L.marker(userCoordinates,{ icon: busLottie }).addTo(map);
+        }
     initLottie();
     let riderCoordinates = [30.104867698463696, 78.29907060455753];
 
-    L.marker(riderCoordinates).addTo(map).bindPopup('Rider is here..').openPopup();
+    if (!riderMarker) {
+        riderMarker = L.marker(riderCoordinates, { icon: homeIcon }).addTo(map).bindPopup('Rider is here..').openPopup();
+    }
     const bounds = L.latLngBounds([userCoordinates, riderCoordinates]);
     map.fitBounds(bounds);
     drawRoute(userCoordinates,riderCoordinates);
@@ -79,7 +94,10 @@ function onLocationError(error){
 // }
 
 function drawRoute(userCoordinates,riderCoordinates){
-    L.Routing.control({
+    if (routingControl) {
+        map.removeControl(routingControl);
+    }
+    routingControl=L.Routing.control({
         waypoints:[
             L.latLng(userCoordinates),
             L.latLng(riderCoordinates)
@@ -87,6 +105,7 @@ function drawRoute(userCoordinates,riderCoordinates){
         routeWhileDragging: true,
         lineOptions:{
             styles:[{color:'purple',weight: 4}]
-        }
+        },
+        show: false
     }).addTo(map);
 }
