@@ -4,6 +4,7 @@ let map = L.map('map').setView([30.1158, 78.2853],13);
 let routingControl;
 let iconPath;
 let distance;
+let markers={};
 let riderCoordinates = [30.104867698463696, 78.29907060455753];
 let busLottie = L.divIcon({
     html: '<div id="lottie"></div>',
@@ -37,7 +38,13 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
 }).addTo(map);
 
 
+let testMode = false; 
+let simulatedCoordinates = [30.1158, 78.2853]; 
 
+if (testMode) {
+    setInterval(simulateLocationChange, 2000);
+}
+else{
 navigator.geolocation.getCurrentPosition(onLocationSuccess,onLocationError,{
     enableHighAccuracy: true,
     timeout: 10000, 
@@ -49,6 +56,18 @@ navigator.geolocation.watchPosition(onLocationChangeSuccess,onLocationChangeErro
     timeout: 10000, 
     maximumAge: 0  
 })
+}
+function simulateLocationChange() {
+    simulatedCoordinates[0] += 0.0001; 
+    simulatedCoordinates[1] += 0.0001; 
+
+    onLocationChangeSuccess({
+        coords: {
+            latitude: simulatedCoordinates[0],
+            longitude: simulatedCoordinates[1]
+        }
+    });
+}
 
 function onLocationChangeSuccess(position){
     const userCoordinates=[position.coords.latitude,position.coords.longitude];
@@ -97,28 +116,30 @@ function drawRoute(userCoordinates,riderCoordinates){
         show: false,
         createMarker: function (i, waypoint, n) {
 
-            if (waypoint.marker) {
-                const newPopupContent = i === 1 ? "User Location" : ("Rider is " + distance + " km away");
-                waypoint.marker.setPopupContent(newPopupContent);
-                return waypoint.marker; 
-            } else {
-                const marker = L.marker(waypoint.latLng, {
-                  draggable: false,
-                  bounceOnAdd: false,
-                  icon: i===1? homeIcon: busLottie
-                });      
+            const markerKey = i === 1 ? 'user' : 'rider'; 
+
+            if (markers[markerKey] && markerKey==0) {               
+                markers[markerKey].setLatLng(waypoint.latLng); 
+                
                 const popupContent = i === 1 ? "User Location" : ("Rider is " + distance + " km away");
-                marker.bindPopup(popupContent);
-                marker.on('click', function() {
-                    marker.openPopup();
-                });           
-                marker.on('touchstart', function() {
-                    marker.openPopup();
-                });
-                waypoint.marker = marker;
+                markers[markerKey].setPopupContent(popupContent); 
+               return markers[markerKey]
+            } else {
+                markers[markerKey] = L.marker(waypoint.latLng, {
+                    draggable: false,
+                    bounceOnAdd: false,
+                    icon: i === 1 ? homeIcon : busLottie
+                }).addTo(map); 
         
-                return marker;
-              }
+                const popupContent = i === 1 ? "User Location" : ("Rider is " + distance + " km away");
+                if(markerKey=='rider'){
+                markers[markerKey].bindPopup(popupContent,{
+                    autoClose: false,  
+                    closeOnClick: false  
+                }).openPopup();
+            }
+                return markers[markerKey];
+            }
             }
     
     }).addTo(map);
