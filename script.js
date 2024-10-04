@@ -4,8 +4,8 @@ let map = L.map('map').setView([30.1158, 78.2853],13);
 let userMarker;
 let busLottie = L.divIcon({
     html: '<div id="lottie"></div>',
-    iconSize: [100, 100],
-    iconAnchor: [50, 50],
+    iconSize: [90, 90],
+    iconAnchor: [45, 45],
     className: '' 
 });
 
@@ -18,7 +18,7 @@ function initLottie() {
             renderer: 'svg',
             loop: true,
             autoplay: true,
-            path: './bus.json'
+            path: './rickshaw.json'
         });
     }
 }
