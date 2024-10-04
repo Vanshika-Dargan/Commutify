@@ -71,7 +71,7 @@ function onLocationSuccess(position){
     drawRoute(userCoordinates,riderCoordinates);
     distance=turf.distance(userCoordinates,riderCoordinates,{units: 'kilometers'});
     distance = distance.toFixed(2);
-    distancePopup=L.popup().setLatLng(userCoordinates).setContent('Rider is  '+distance+' km away').openOn(map);
+    //distancePopup=L.popup().setLatLng(userCoordinates).setContent('Rider is  '+distance+' km away').openOn(map);
     initLottie();
 }
 
