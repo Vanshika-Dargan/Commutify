@@ -2,6 +2,27 @@
 // lat long zoom level
 let map = L.map('map').setView([30.1158, 78.2853],13);
 let userMarker;
+let busLottie = L.divIcon({
+    html: '<div id="lottie"></div>',
+    iconSize: [100, 100],
+    iconAnchor: [50, 50],
+    className: '' 
+});
+
+
+function initLottie() {
+    let lottieContainer = document.getElementById('lottie');
+    if (lottieContainer) {
+        lottie.loadAnimation({
+            container: lottieContainer,
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: './bus.json'
+        });
+    }
+}
+
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
     maxZoom: 16,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -25,7 +46,8 @@ function onLocationChangeSuccess(position){
     if(userMarker)
     map.removeLayer(userMarker);
     const userCoordinates=[position.coords.latitude,position.coords.longitude];
-    userMarker=L.marker(userCoordinates).addTo(map).bindPopup(userCoordinates.toString()).openPopup();
+    userMarker=L.marker(userCoordinates,{ icon: busLottie }).addTo(map);
+    initLottie();
 }
 
 function onLocationChangeError(error){
@@ -34,7 +56,8 @@ function onLocationChangeError(error){
 function onLocationSuccess(position){
     const userCoordinates=[position.coords.latitude,position.coords.longitude];
     
-     userMarker=L.marker(userCoordinates).addTo(map).bindPopup('You are here').openPopup();
+    userMarker=L.marker(userCoordinates,{ icon: busLottie }).addTo(map);
+    initLottie();
     let riderCoordinates = [30.104867698463696, 78.29907060455753];
 
     L.marker(riderCoordinates).addTo(map).bindPopup('Rider is here..').openPopup();
