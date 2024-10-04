@@ -95,13 +95,18 @@ function drawRoute(userCoordinates,riderCoordinates){
             styles:[{color:'purple',weight: 4}]
         },
         show: false,
-            createMarker: function (i, waypoint, n) {
+        createMarker: function (i, waypoint, n) {
 
+            if (waypoint.marker) {
+                const newPopupContent = i === 1 ? "User Location" : ("Rider is " + distance + " km away");
+                waypoint.marker.setPopupContent(newPopupContent);
+                return waypoint.marker; 
+            } else {
                 const marker = L.marker(waypoint.latLng, {
                   draggable: false,
                   bounceOnAdd: false,
                   icon: i===1? homeIcon: busLottie
-                });
+                });      
                 const popupContent = i === 1 ? "User Location" : ("Rider is " + distance + " km away");
                 marker.bindPopup(popupContent);
                 marker.on('click', function() {
@@ -110,8 +115,11 @@ function drawRoute(userCoordinates,riderCoordinates){
                 marker.on('touchstart', function() {
                     marker.openPopup();
                 });
+                waypoint.marker = marker;
+        
                 return marker;
               }
+            }
     
     }).addTo(map);
 }
