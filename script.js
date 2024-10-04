@@ -52,8 +52,6 @@ navigator.geolocation.watchPosition(onLocationChangeSuccess,onLocationChangeErro
 
 function onLocationChangeSuccess(position){
     const userCoordinates=[position.coords.latitude,position.coords.longitude];
-    const bounds = L.latLngBounds([userCoordinates, riderCoordinates]);
-    map.fitBounds(bounds);
     drawRoute(userCoordinates,riderCoordinates);
     distance=turf.distance(userCoordinates,riderCoordinates,{units: 'kilometers'});
     distance = distance.toFixed(2);
@@ -100,7 +98,7 @@ function drawRoute(userCoordinates,riderCoordinates){
             createMarker: function (i, waypoint, n) {
 
                 const marker = L.marker(waypoint.latLng, {
-                  draggable: true,
+                  draggable: false,
                   bounceOnAdd: false,
                   icon: i===1? homeIcon: busLottie
                 });
