@@ -3,7 +3,6 @@
 let map = L.map('map').setView([30.1158, 78.2853],13);
 let routingControl;
 let iconPath;
-let distancePopup;
 let distance;
 let riderCoordinates = [30.104867698463696, 78.29907060455753];
 let busLottie = L.divIcon({
@@ -71,7 +70,6 @@ function onLocationSuccess(position){
     drawRoute(userCoordinates,riderCoordinates);
     distance=turf.distance(userCoordinates,riderCoordinates,{units: 'kilometers'});
     distance = distance.toFixed(2);
-    //distancePopup=L.popup().setLatLng(userCoordinates).setContent('Rider is  '+distance+' km away').openOn(map);
     initLottie();
 }
 
