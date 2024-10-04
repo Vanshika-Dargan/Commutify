@@ -1,9 +1,8 @@
 
 // lat long zoom level
 let map = L.map('map').setView([30.1158, 78.2853],13);
-let userMarker;
-let riderMarker;
 let routingControl;
+let iconPath;
 let busLottie = L.divIcon({
     html: '<div id="lottie"></div>',
     iconSize: [60, 60],
@@ -51,37 +50,21 @@ navigator.geolocation.watchPosition(onLocationChangeSuccess,onLocationChangeErro
 
 function onLocationChangeSuccess(position){
     const userCoordinates=[position.coords.latitude,position.coords.longitude];
-    if(userMarker){
-    userMarker.setLatLng(userCoordinates);
-    }
-    else{
-        userMarker=L.marker(userCoordinates,{ icon: busLottie }).addTo(map);
-    }
 }
 
 function onLocationChangeError(error){
     alert('Unable to retriev your location:'+error.message)
 }
 function onLocationSuccess(position){
-    const userCoordinates=[position.coords.latitude,position.coords.longitude];
-    if(userMarker){
-        userMarker.setLatLng(userCoordinates);
-        }
-        else{
-            userMarker=L.marker(userCoordinates,{ icon: busLottie }).addTo(map);
-        }
-    initLottie();
+    const userCoordinates=[position.coords.latitude,position.coords.longitude];  
     let riderCoordinates = [30.104867698463696, 78.29907060455753];
-
-    if (!riderMarker) {
-        riderMarker = L.marker(riderCoordinates, { icon: homeIcon }).addTo(map).bindPopup('Rider is here..').openPopup();
-    }
     const bounds = L.latLngBounds([userCoordinates, riderCoordinates]);
     map.fitBounds(bounds);
     drawRoute(userCoordinates,riderCoordinates);
     let distance=turf.distance(userCoordinates,riderCoordinates,{units: 'kilometers'});
     distance = distance.toFixed(2);
     L.popup().setLatLng(riderCoordinates).setContent('Rider is  '+distance+' km away').openOn(map);
+    initLottie();
 }
 
 function onLocationError(error){
@@ -103,9 +86,27 @@ function drawRoute(userCoordinates,riderCoordinates){
             L.latLng(riderCoordinates)
         ],
         routeWhileDragging: true,
+
         lineOptions:{
             styles:[{color:'purple',weight: 4}]
         },
-        show: false
+        show: false,
+            createMarker: function (i, waypoint, n) {
+
+                const marker = L.marker(waypoint.latLng, {
+                  draggable: true,
+                  bounceOnAdd: false,
+                  bounceOnAddOptions: {
+                    duration: 1000,
+                    height: 800,
+                    function() {
+                      (bindPopup(myPopup).openOn(map))
+                    }
+                  },
+                  icon: i==1? homeIcon: busLottie
+                });
+                return marker;
+              }
+    
     }).addTo(map);
 }
