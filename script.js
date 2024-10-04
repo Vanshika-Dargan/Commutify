@@ -51,7 +51,12 @@ navigator.geolocation.watchPosition(onLocationChangeSuccess,onLocationChangeErro
 
 function onLocationChangeSuccess(position){
     const userCoordinates=[position.coords.latitude,position.coords.longitude];
+    const bounds = L.latLngBounds([userCoordinates, riderCoordinates]);
+    map.fitBounds(bounds);
     drawRoute(userCoordinates,riderCoordinates);
+    let distance=turf.distance(userCoordinates,riderCoordinates,{units: 'kilometers'});
+    distance = distance.toFixed(2);
+    L.popup().setLatLng(userCoordinates).setContent('Rider is  '+distance+' km away').openOn(map);
     initLottie();
 }
 
@@ -65,7 +70,7 @@ function onLocationSuccess(position){
     drawRoute(userCoordinates,riderCoordinates);
     let distance=turf.distance(userCoordinates,riderCoordinates,{units: 'kilometers'});
     distance = distance.toFixed(2);
-    L.popup().setLatLng(riderCoordinates).setContent('Rider is  '+distance+' km away').openOn(map);
+    L.popup().setLatLng(userCoordinates).setContent('Rider is  '+distance+' km away').openOn(map);
     initLottie();
 }
 
