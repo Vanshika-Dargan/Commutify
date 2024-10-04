@@ -4,6 +4,7 @@ let map = L.map('map').setView([30.1158, 78.2853],13);
 let routingControl;
 let iconPath;
 let distancePopup;
+let distance;
 let riderCoordinates = [30.104867698463696, 78.29907060455753];
 let busLottie = L.divIcon({
     html: '<div id="lottie"></div>',
@@ -55,13 +56,8 @@ function onLocationChangeSuccess(position){
     const bounds = L.latLngBounds([userCoordinates, riderCoordinates]);
     map.fitBounds(bounds);
     drawRoute(userCoordinates,riderCoordinates);
-    let distance=turf.distance(userCoordinates,riderCoordinates,{units: 'kilometers'});
+    distance=turf.distance(userCoordinates,riderCoordinates,{units: 'kilometers'});
     distance = distance.toFixed(2);
-    if (distancePopup) {
-        distancePopup.setLatLng(userCoordinates).setContent('Rider is ' + distance + ' km away').update();
-    } else {
-        distancePopup = L.popup().setLatLng(userCoordinates).setContent('Rider is ' + distance + ' km away').openOn(map);
-    }
     initLottie();
 }
 
@@ -73,7 +69,7 @@ function onLocationSuccess(position){
     const bounds = L.latLngBounds([userCoordinates, riderCoordinates]);
     map.fitBounds(bounds);
     drawRoute(userCoordinates,riderCoordinates);
-    let distance=turf.distance(userCoordinates,riderCoordinates,{units: 'kilometers'});
+    distance=turf.distance(userCoordinates,riderCoordinates,{units: 'kilometers'});
     distance = distance.toFixed(2);
     distancePopup=L.popup().setLatLng(userCoordinates).setContent('Rider is  '+distance+' km away').openOn(map);
     initLottie();
@@ -83,10 +79,7 @@ function onLocationError(error){
     alert('Unable to retrieve your location'+error.message)
 }
 
-// function drawRoute(userCoordinates,riderCoordinates){
-// const latlngs=[userCoordinates,riderCoordinates];
-// const polyline = L.polyline(latlngs,{color:'red'}).addTo(map);
-// }
+
 
 function drawRoute(userCoordinates,riderCoordinates){
     if (routingControl) {
@@ -111,14 +104,15 @@ function drawRoute(userCoordinates,riderCoordinates){
                 const marker = L.marker(waypoint.latLng, {
                   draggable: true,
                   bounceOnAdd: false,
-                  bounceOnAddOptions: {
-                    duration: 1000,
-                    height: 800,
-                    function() {
-                      (bindPopup(myPopup).openOn(map))
-                    }
-                  },
-                  icon: i==1? homeIcon: busLottie
+                  icon: i===1? homeIcon: busLottie
+                });
+                const popupContent = i === 1 ? "User Location" : ("Rider is " + distance + " km away");
+                marker.bindPopup(popupContent);
+                marker.on('click', function() {
+                    marker.openPopup();
+                });           
+                marker.on('touchstart', function() {
+                    marker.openPopup();
                 });
                 return marker;
               }
